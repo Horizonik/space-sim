@@ -8,6 +8,8 @@ public class StarGenerator : MonoBehaviour
     public Star[] randomStars;
     System.Random rnd = new System.Random();
 
+    public int amountOfSystems = 6;
+
     void Start()
     {
         randomStars = new Star[10];
@@ -17,19 +19,21 @@ public class StarGenerator : MonoBehaviour
     // Randomly creates stars and systems for testing purposes
     void StarSystemCreator()
     {
-        for (int i = 0; i < randomStars.Length; i++)
+        for (int j = 0; j < amountOfSystems; j++)
         {
-            Star s = new Star("star" + i, rnd.Next(15), planetTypes[rnd.Next(planetTypes.Length)]);
-            randomStars[i] = s;
+            for (int i = 0; i < randomStars.Length; i++)
+            {
+                Star s = new Star(StarNameGenerator(), rnd.Next(15), i, planetTypes[rnd.Next(planetTypes.Length)]);
+                randomStars[i] = s;
+            }
+            StarSystem sSystem = new StarSystem(StarSystemNameGenerator(), j, randomStars);
+            sSystem.starsInSystem();
         }
-
-        StarSystem sSystem = new StarSystem(StarSystemNameGenerator(), randomStars);
-        sSystem.starsInSystem();
     }
 
     string StarSystemNameGenerator()
     {
-        string[] consonants = {"b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "l", "n", "p", "q", "r", "s", "sh", "zh", "t", "v", "w", "x"};
+        string[] consonants = { "b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "l", "n", "p", "q", "r", "s", "sh", "zh", "t", "v", "w", "x" };
         string[] vowels = { "a", "e", "i", "o", "u", "ae", "y" };
         string systemName = "";
 
@@ -41,10 +45,68 @@ public class StarGenerator : MonoBehaviour
             systemName += consonants[rnd.Next(consonants.Length)];
             systemName += vowels[rnd.Next(vowels.Length)];
 
-            lettersInName+= 2;
+            lettersInName = systemName.Length;
         }
 
-        return systemName;
+        return char.ToUpper(systemName[0]) + systemName.Substring(1);
+    }
+
+    public string StarNameGenerator()
+    {
+        string[] consonants = { "b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "l", "n", "p", "q", "r", "s", "sh", "zh", "t", "v", "w", "x" };
+        string[] vowels = { "a", "e", "i", "o", "u", "ae", "y" };
+
+        string[] numbers = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+        string starName = "";
+
+        int lettersInName = 0;
+        int nameLength = rnd.Next(4, 6);
+
+        while (lettersInName < nameLength)
+        {
+            starName += consonants[rnd.Next(consonants.Length)];
+            starName += consonants[rnd.Next(consonants.Length)];
+            starName += vowels[rnd.Next(vowels.Length)];
+
+            lettersInName = starName.Length;
+        }
+
+        int numAmount = rnd.Next(3);
+
+
+        for (int i = 0; i <= numAmount; i++)
+        {
+            starName += numbers[rnd.Next(9)];
+        }
+
+        return char.ToUpper(starName[0]) + starName.Substring(1);
+    }
+}
+
+public class Constellation
+{
+    public string conName;
+    public string conAttrType; // attribute type affects what attributes the constellation provides
+    public int conSystemAmount;
+    public GameObject conType; // how the constellation will look
+
+    private string[] conAttributes = { "Photonian", "Quadcentric", "Kimoterian", "Terragenetic", "Jurocantic" };
+    System.Random rnd = new System.Random();
+
+    public Constellation(string name, int amount, GameObject type)
+    {
+        this.conName = name;
+        this.conSystemAmount = amount;
+        this.conType = type;
+        this.conAttrType = AttributeGenerator();
+    }
+
+    public string AttributeGenerator()
+    {
+        int rndNum = rnd.Next(5);
+        string attr = conAttributes[rndNum];
+
+        return attr;
     }
 }
 
@@ -53,11 +115,15 @@ public class Star
     public string starName;
     public GameObject starType;
     public float starSize;
+    public int starId;
 
-    public Star(string name, float size, GameObject type)
+    System.Random rnd = new System.Random();
+
+    public Star(string name, float size, int id, GameObject type)
     {
         this.starName = name;
         this.starSize = size;
+        this.starId = id;
         this.starType = type;
     }
 }
@@ -66,16 +132,18 @@ public class StarSystem
 {
     public int starAmount; // Amount of stars on system
     public string systemName; // System's name
+    public int systemId;
     public Star[] systemStars; // Stars on system
 
     // Max & Min distances between planets on system, will be used for random distance later on
     private float min_dist = 10;
     private float max_dist = 40;
 
-    public StarSystem(string name, Star[] stars)
+    public StarSystem(string name, int id, Star[] stars)
     {
         this.systemName = name;
         this.systemStars = stars;
+        this.systemId = id;
         this.starAmount = systemStars.Length;
     }
 
