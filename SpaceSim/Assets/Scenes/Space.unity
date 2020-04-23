@@ -276,6 +276,8 @@ GameObject:
   - component: {fileID: 372908484}
   - component: {fileID: 372908483}
   - component: {fileID: 372908485}
+  - component: {fileID: 372908486}
+  - component: {fileID: 372908487}
   m_Layer: 0
   m_Name: ScriptHandler
   m_TagString: Untagged
@@ -299,7 +301,6 @@ MonoBehaviour:
   - {fileID: 1871034286138086560, guid: 3480bf64c20aba1458f99ca7061c6ce6, type: 3}
   - {fileID: 5037621578334599228, guid: 4d0fc1a0c2a879b419e455caef59899d, type: 3}
   - {fileID: 1640317186950359125, guid: f8992331775ec6441af3a51abece7446, type: 3}
-  amountOfSystems: 6
 --- !u!4 &372908484
 Transform:
   m_ObjectHideFlags: 0
@@ -337,6 +338,30 @@ MonoBehaviour:
   menuToggleKey: 0
   rollLeftKey: 0
   rollRightKey: 0
+--- !u!114 &372908486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 372908482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77a1effc7e9a4294bbed4107aa5cf46e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &372908487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 372908482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6745d4438f7759241b4596a6510bbf30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &732063334
 GameObject:
   m_ObjectHideFlags: 0

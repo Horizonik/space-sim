@@ -6,9 +6,11 @@ public class StarGenerator : MonoBehaviour
 {
     public GameObject[] planetTypes;
     public Star[] randomStars;
-    System.Random rnd = new System.Random();
+    public Constellation[] constellations;
 
-    public int amountOfSystems = 6;
+    private int amountOfSystems = 6; // amount of systems to create when running game
+    private System.Random rnd = new System.Random();
+
 
     void Start()
     {
@@ -51,7 +53,7 @@ public class StarGenerator : MonoBehaviour
         return char.ToUpper(systemName[0]) + systemName.Substring(1);
     }
 
-    public string StarNameGenerator()
+    string StarNameGenerator()
     {
         string[] consonants = { "b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "l", "n", "p", "q", "r", "s", "sh", "zh", "t", "v", "w", "x" };
         string[] vowels = { "a", "e", "i", "o", "u", "ae", "y" };
@@ -83,32 +85,6 @@ public class StarGenerator : MonoBehaviour
     }
 }
 
-public class Constellation
-{
-    public string conName;
-    public string conAttrType; // attribute type affects what attributes the constellation provides
-    public int conSystemAmount;
-    public GameObject conType; // how the constellation will look
-
-    private string[] conAttributes = { "Photonian", "Quadcentric", "Kimoterian", "Terragenetic", "Jurocantic" };
-    System.Random rnd = new System.Random();
-
-    public Constellation(string name, int amount, GameObject type)
-    {
-        this.conName = name;
-        this.conSystemAmount = amount;
-        this.conType = type;
-        this.conAttrType = AttributeGenerator();
-    }
-
-    public string AttributeGenerator()
-    {
-        int rndNum = rnd.Next(5);
-        string attr = conAttributes[rndNum];
-
-        return attr;
-    }
-}
 
 public class Star
 {
@@ -130,8 +106,8 @@ public class Star
 
 public class StarSystem
 {
-    public int starAmount; // Amount of stars on system
     public string systemName; // System's name
+    public int starAmount; // Amount of stars on system
     public int systemId;
     public Star[] systemStars; // Stars on system
 
@@ -139,12 +115,27 @@ public class StarSystem
     private float min_dist = 10;
     private float max_dist = 40;
 
+    // basic system builder
+    public StarSystem(string name, int id)
+    {
+        this.systemName = name;
+        this.systemId = id;
+        this.starAmount = 0;
+    }
+
+    // builder with input for star array
     public StarSystem(string name, int id, Star[] stars)
     {
         this.systemName = name;
         this.systemStars = stars;
         this.systemId = id;
         this.starAmount = systemStars.Length;
+    }
+
+    public void AddStarsToSystem(Star star)
+    {
+        this.systemStars[starAmount] = star;
+        starAmount++;
     }
 
     public void setName(string newName)
@@ -165,6 +156,50 @@ public class StarSystem
         for (int i = 0; i < this.systemStars.Length; i++)
         {
             Debug.Log(this.systemStars[i].starName + " of type " + this.systemStars[i].starType);
+        }
+    }
+}
+
+public class Constellation
+{
+    public string conName;
+    public string conAttrType; // attribute type affects what attributes the constellation provides
+    public int conSystemAmount; // amount of star systems in constellation, used for when adding or removing systems from constellation
+    public StarSystem[] systemsInConst; // star systems that are in the constellation
+    public GameObject conType; // how the constellation will look, what is its type, each constellation type will have a different color, green, red, purple, blue
+
+    public string[] conAttributes = { "Photonian", "Quadcentric", "Kimoterian", "Terragenetic", "Jurocantic" };
+    private System.Random rnd = new System.Random();
+
+    public Constellation(string name, int amount, GameObject type)
+    {
+        this.conName = name;
+        this.conSystemAmount = 0;
+        this.conType = type;
+        this.conAttrType = AttributeGenerator();
+    }
+
+    string AttributeGenerator()
+    {
+        int rndNum = rnd.Next(5);
+        string attr = this.conAttributes[rndNum];
+
+        return attr;
+    }
+
+    // Add the star system to the given constellation
+    public void AddStarSystemToConstellation(StarSystem system)
+    {
+        this.systemsInConst[conSystemAmount] = system;
+        conSystemAmount++;
+    }
+
+    public void systemsInConstellation()
+    {
+        Debug.Log(">> Star systems on constellation " + this.conName + " are:");
+        for (int i = 0; i < this.systemsInConst.Length; i++)
+        {
+            Debug.Log(this.systemsInConst[i].systemName + " that has " + this.systemsInConst[i].systemStars.Length + " stars.");
         }
     }
 }
