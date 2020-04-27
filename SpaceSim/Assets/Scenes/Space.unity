@@ -301,6 +301,7 @@ MonoBehaviour:
   - {fileID: 1871034286138086560, guid: 3480bf64c20aba1458f99ca7061c6ce6, type: 3}
   - {fileID: 5037621578334599228, guid: 4d0fc1a0c2a879b419e455caef59899d, type: 3}
   - {fileID: 1640317186950359125, guid: f8992331775ec6441af3a51abece7446, type: 3}
+  systemContainer: {fileID: 2048798455}
 --- !u!4 &372908484
 Transform:
   m_ObjectHideFlags: 0
