@@ -6,15 +6,20 @@ public class StarGenerator : MonoBehaviour
 {
     private System.Random rnd = new System.Random();
 
+    [Header("Prefab Inputs")]
     public GameObject[] planetTypes;
     public GameObject systemContainer;
+    private RotateAroundObject rotateAroundObject;
+
+    [Header("How many star systems to create")]
+    public int starSystemAmount = 1;
     // public Constellation[] constellations;
 
     // Distances between systems and planets, TODO: make it customizable at create game screen
-    private float min_dist = 40;
-    private float max_dist = 100;
-    private float min_sys_dist = 30;
-    private float max_sys_dist = 40;
+    private float min_dist = 30;
+    private float max_dist = 70;
+    private float min_sys_dist = -1000;
+    private float max_sys_dist = 1000;
 
     private Vector2 distanceKeeper = Vector2.zero; // distance between systems
 
@@ -23,12 +28,13 @@ public class StarGenerator : MonoBehaviour
 
     void Start()
     {
-        rndSysCreator(10);
+        for (int i = 1; i <= starSystemAmount; i++)
+            rndSysCreator(10);
     }
 
     Star rndStarCreator(StarSystem sys)
     {
-        Star s = new Star(StarNameGenerator(), rnd.Next(15), planetTypes[rnd.Next(planetTypes.Length)], starIdCounter, sys);
+        Star s = new Star(StarNameGenerator(), rnd.Next(7, 30), planetTypes[rnd.Next(planetTypes.Length)], starIdCounter, sys);
         starIdCounter++;
         return s;
     }
@@ -41,20 +47,19 @@ public class StarGenerator : MonoBehaviour
         systemIdCounter++;
 
         // Get a random location for the system to be in
-        distanceKeeper = new Vector2(distanceKeeper.x + Random.Range(min_sys_dist, max_sys_dist), distanceKeeper.y + Random.Range(min_sys_dist, max_sys_dist));
-        Vector3 rndSysPos = new Vector3(Random.Range(min_dist, max_dist) + distanceKeeper.x, 0, Random.Range(min_dist, max_dist) + distanceKeeper.y); // variable to store random system position
+        Vector3 rndSysPos = new Vector3(rnd.Next((int)min_dist, (int)max_dist) + distanceKeeper.x, 0, rnd.Next((int)min_dist, (int)max_dist) + distanceKeeper.y); // variable to store random system position
 
         // Instnatiate a center point at the system location
         GameObject emptyObj = new GameObject();
-        GameObject sysCenter = Instantiate(emptyObj, rndSysPos, Quaternion.identity);
+        GameObject centerPoint = Instantiate(emptyObj, rndSysPos, Quaternion.identity);
 
-        sysCenter.name = "sys" + system.sysId + " " + system.sysName;
+        centerPoint.name = "sys" + system.sysId + " " + system.sysName;
         if (systemContainer != null)
-            sysCenter.transform.parent = systemContainer.transform;
+            centerPoint.transform.parent = systemContainer.transform;
         else
             Debug.Log("StarGenerator>> System container missing! Please add it in public input");
 
-        system.sysCenter = sysCenter;
+        system.sysCenter = centerPoint;
 
         // Randomly generate and add stars to system
         for (int i = 0; i < systemStarAmount; i++)
@@ -63,17 +68,30 @@ public class StarGenerator : MonoBehaviour
         }
 
         // Instantiate stars in a straight line going out from the center point(so they could then spin around it in a ring shape)
-        Vector3 starInSysPosX = rndSysPos;
+        Vector3 newStarPosition = rndSysPos;
 
         for (int i = 0; i < system.sysStars.Length; i++)
         {
-            starInSysPosX.x += rnd.Next((int)min_dist, (int)max_dist);
-            GameObject tempObj = Instantiate(system.sysStars[i].starType, starInSysPosX, Quaternion.identity);
+            // Set up star position from center
+            newStarPosition.x += rnd.Next((int)min_dist, (int)max_dist);
+            newStarPosition.z += rnd.Next((int)min_dist, (int)max_dist);
+
+            GameObject tempObj = Instantiate(system.sysStars[i].starType, newStarPosition, Quaternion.identity);
+
+            // Set the center point as the rotation point for the stars
+            // RotateAroundObject tempStarRotateAround = tempObj.starType.GetComponent<RotateAroundObject>();
+            tempObj.GetComponent<RotateAroundObject>().SetTargetObject(centerPoint);
+
+            // Set star size from the randomly generated size to the physical object
+            tempObj.transform.localScale = new Vector3(system.sysStars[i].starSize, system.sysStars[i].starSize, system.sysStars[i].starSize);
 
             tempObj.name = "sys" + system.sysStars[i].belongingSys.sysId + " star" + system.sysStars[i].starId;
             if (systemContainer != null)
-                tempObj.transform.parent = sysCenter.transform;
+                tempObj.transform.parent = centerPoint.transform;
         }
+
+        // Set distance keeper for the next system to be created in a different spot
+        distanceKeeper = new Vector2(centerPoint.transform.position.x + rnd.Next((int)min_sys_dist, (int)max_sys_dist), centerPoint.transform.position.z + rnd.Next((int)min_sys_dist, (int)max_sys_dist));
 
 
         // Check for stars in system, if there are stars then instantiate them around the center point, make sure there aren't two stars touching.
